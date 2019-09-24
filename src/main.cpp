@@ -11,7 +11,10 @@
 
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
-#include "Test.hh"
+#include "Profile.h"
+#include "Action.h"
+#include "PropertyAction.h"
+#include "Property.h"
 
 static UART_HandleTypeDef s_UARTHandle;
 int calls = 0;
@@ -293,3 +296,4 @@ int main(){
 
 	return 0;
 }
+
