@@ -28,7 +28,6 @@ Action* getNewAction(int position_index){
 	Action* new_action;
 	if (position_type == 0){
 		new_action = new PropertyAction(position_index);
-		return getPropertyAction(position_index);
 	}
 	return new_action;
 }
