@@ -22,6 +22,8 @@
 #ifndef PROPERTY_H_
 #define PROPERTY_H_
 
+#include "Profile.h"
+
 class Property {
 public:
 	int position;
@@ -38,10 +40,13 @@ public:
 	int one_utility_mult;
 	int two_utility_mult;
 	int property_set;
+	Profile* owner;
 
 	Property(int, int, int, int, int, int, int property_rents[6], int);
-	Property::Property(int position);
+	Property(int position);
 	virtual ~Property();
+
+	int getCurrentRent();
 private:
 	int current_rent;
 };

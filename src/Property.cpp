@@ -28,6 +28,7 @@ Property::Property(int position, int type, int cost, int mortgage_bonus, int mor
 	two_utility_mult = 10;
 
 	current_rent = 0;
+	owner = 0;
 }
 
 Property::Property(int position){
@@ -37,7 +38,9 @@ Property::Property(int position){
 	mortgage_bonus = 0;
 	mortgage_removal_cost = 0;
 	add_house_cost = 0;
-	property_rents = {0, 0, 0, 0, 0, 0};
+	for(int i = 0; i < 6; i++){
+		property_rents[i] = 0;
+	}
 	owned = false;
 	mortgaged = false;
 	num_houses = 0;
@@ -46,6 +49,7 @@ Property::Property(int position){
 	two_utility_mult = 10;
 	property_set = -1;
 	current_rent = 0;
+	owner = 0;
 }
 Property::~Property() {
 	// TODO Auto-generated destructor stub

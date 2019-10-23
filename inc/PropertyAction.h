@@ -8,7 +8,7 @@
 #ifndef PROPERTYACTION_H_
 #define PROPERTYACTION_H_
 
-#include <Action.h>
+#include "Action.h"
 
 class PropertyAction: public Action {
 public:

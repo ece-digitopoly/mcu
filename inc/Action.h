@@ -8,10 +8,13 @@
 #ifndef ACTION_H_
 #define ACTION_H_
 
+
 class Action {
 public:
 	Action();
 	virtual ~Action();
+
+	bool end_action;
 };
 
 #endif /* ACTION_H_ */

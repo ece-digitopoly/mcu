@@ -1,9 +1,15 @@
+#include "Profile.h"
+#include "Action.h"
+#include "PropertyAction.h"
+#include "global_vars.h"
+#include "stm32f4xx.h"
+#include "stm32f4_discovery.h"
 //GLOBALS
-Profile* current_player;
-int WAITING_FOR_INPUT = 1;
+
+void movePlayer(Profile* player, int dice_roll);
 
 int getDiceRoll(){
-	return 0;
+	return 2;
 }
 
 int moveMotors(int old_position, int new_position){
@@ -42,10 +48,8 @@ void play(){
 		movePlayer(current_player, dice_roll);
 
 		Action *new_action = getNewAction(current_player->position);
-		//send new_action -> call UART
-		while(!new_action->action_complete){
-			new_action = getNextAction(new_action->next_action);
-			//send new_action -> call UART
-		}
+		HAL_Delay(1000);
+
+		//send user data to pi
 	}
 }

@@ -11,12 +11,13 @@
 
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
+#include "global_vars.h"
 #include "Profile.h"
 #include "Action.h"
 #include "PropertyAction.h"
 #include "Property.h"
 
-static UART_HandleTypeDef s_UARTHandle;
+//static UART_HandleTypeDef s_UARTHandle;
 int calls = 0;
 int ifs = 0;
 int elses = 0;
