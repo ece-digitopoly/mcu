@@ -14,17 +14,14 @@
 #include "../inc/Util.h"
 #include "../inc/rn4020.h"
 			
-static UART_HandleTypeDef s_UART1Handle;
-static UART_HandleTypeDef s_UART2Handle;
-
 void scrollDown(){
 	uint8_t buffer[] = "{\"action\": \"scroll\", \"direction\": \"down\"}\r\n";
-	HAL_UART_Transmit(&s_UART2Handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 }
 
 void scrollUp(){
 	uint8_t buffer[] = "{\"action\": \"scroll\", \"direction\": \"up\"}\r\n";
-	HAL_UART_Transmit(&s_UART2Handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 }
 
 void Error_Handler(){
@@ -69,17 +66,7 @@ void SystemClock_Config(void)
   }
 }
 
-
-int main(void)
-{
-	HAL_Init();
-	SystemClock_Config(); //Use internal clock
-	__USART1_CLK_ENABLE();
-	__USART2_CLK_ENABLE();
-	__GPIOA_CLK_ENABLE();
-	__GPIOB_CLK_ENABLE();
-
-
+void init_gpio(){
 	GPIO_InitTypeDef GPIO_InitStruct;
 
 	//Setup UART2
@@ -91,17 +78,6 @@ int main(void)
 	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	s_UART2Handle.Instance	 	 = USART2;
-	s_UART2Handle.Init.BaudRate	 = 115200;
-	s_UART2Handle.Init.WordLength = UART_WORDLENGTH_8B;
-	s_UART2Handle.Init.StopBits	 = UART_STOPBITS_1;
-	s_UART2Handle.Init.Parity	 = UART_PARITY_NONE;
-	s_UART2Handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
-	s_UART2Handle.Init.Mode	   	 = UART_MODE_TX_RX;
-
-	if (HAL_UART_Init(&s_UART2Handle) != HAL_OK)
-		asm("bkpt 255");
-
 	//Setup UART1
 	/*Configure GPIO pins : PA9 PA10 */
 	GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
@@ -111,47 +87,58 @@ int main(void)
 	GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	s_UART1Handle.Instance	 	 = USART1;
-	s_UART1Handle.Init.BaudRate	 = 115200;
-	s_UART1Handle.Init.WordLength = UART_WORDLENGTH_8B;
-	s_UART1Handle.Init.StopBits	 = UART_STOPBITS_1;
-	s_UART1Handle.Init.Parity	 = UART_PARITY_NONE;
-	s_UART1Handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
-	s_UART1Handle.Init.Mode	   	 = UART_MODE_TX_RX;
-
-	if (HAL_UART_Init(&s_UART1Handle) != HAL_OK)
-		asm("bkpt 255");
-
-
 	//Light LED1
 	/*Configure GPIO pin : PB2 */
 	GPIO_InitStruct.Pin = GPIO_PIN_2;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+
+void init_uart(){
+	//UART1 = RN4020
+	//UART2 = Raspberry Pi
+
+	Util::raspi_handle.Instance	 	 = USART2;
+	Util::raspi_handle.Init.BaudRate	 = 115200;
+	Util::raspi_handle.Init.WordLength = UART_WORDLENGTH_8B;
+	Util::raspi_handle.Init.StopBits	 = UART_STOPBITS_1;
+	Util::raspi_handle.Init.Parity	 = UART_PARITY_NONE;
+	Util::raspi_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
+	Util::raspi_handle.Init.Mode	   	 = UART_MODE_TX_RX;
+
+	if (HAL_UART_Init(&Util::raspi_handle) != HAL_OK)
+		asm("bkpt 255");
+
+	Util::rn4020_handle.Instance	 	 = USART1;
+	Util::rn4020_handle.Init.BaudRate	 = 115200;
+	Util::rn4020_handle.Init.WordLength = UART_WORDLENGTH_8B;
+	Util::rn4020_handle.Init.StopBits	 = UART_STOPBITS_1;
+	Util::rn4020_handle.Init.Parity	 = UART_PARITY_NONE;
+	Util::rn4020_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
+	Util::rn4020_handle.Init.Mode	   	 = UART_MODE_TX_RX;
+
+	if (HAL_UART_Init(&Util::rn4020_handle) != HAL_OK)
+		asm("bkpt 255");
+}
+
+int main(void)
+{
+	HAL_Init();
+
+	SystemClock_Config(); //Use internal clock
+
+	__USART1_CLK_ENABLE();
+	__USART2_CLK_ENABLE();
+	__GPIOA_CLK_ENABLE();
+	__GPIOB_CLK_ENABLE();
+
+	init_gpio();
+	init_uart();
 
 	uint8_t rbuffer[3];
 
-	//Set mode as central
-//	unsigned char buffer1[] = "SR,80000000";
-//	buffer1[11] = '\r';
-//	HAL_UART_Transmit(&s_UART1Handle, buffer1, sizeof(buffer1), HAL_MAX_DELAY);
-////	HAL_Delay(1000);
-//	HAL_UART_Receive(&s_UART1Handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
-//	HAL_Delay(1000);
-
-	//Reboot
-//	uint8_t buffer2[] = "R,1";
-//
-//	HAL_UART_Transmit(&s_UART1Handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
-//	HAL_Delay(5000);
-
-	//Connect to Die 1
-	uint8_t buffer3[] = "E,1,DE1030E87B1D";
-	buffer3[16] = '\r';
-	HAL_UART_Transmit(&s_UART1Handle, buffer3, sizeof(buffer3), HAL_MAX_DELAY);
-	HAL_UART_Receive(&s_UART1Handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
-	HAL_Delay(1000);
+	init_dice();
 
 	uint8_t buffer4[] = "CURV,2A19";
 	buffer4[9] = '\r';
@@ -161,13 +148,13 @@ int main(void)
 
 	for(;;){
 		//Read value
-		HAL_UART_Transmit(&s_UART1Handle, buffer4, sizeof(buffer4), HAL_MAX_DELAY);
+		HAL_UART_Transmit(&Util::rn4020_handle, buffer4, sizeof(buffer4), HAL_MAX_DELAY);
 		//Receive value
-		HAL_UART_Receive(&s_UART1Handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
+		HAL_UART_Receive(&Util::rn4020_handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
 		HAL_Delay(10);
 		sbuffer[11] = obuffer[4];
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-		HAL_UART_Transmit(&s_UART2Handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
+		HAL_UART_Transmit(&Util::raspi_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 		HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 	}

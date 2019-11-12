@@ -4,6 +4,6 @@
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
 
-void init_ble_uart();
-
+void init_rn4020();
+void init_dice();
 #endif

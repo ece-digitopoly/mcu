@@ -1,46 +1,33 @@
 #include "../inc/rn4020.h"
 #include "../inc/Util.h"
 
-void init_ble_uart(){
-	GPIO_InitTypeDef GPIO_InitStruct;
+void init_rn4020(){
+	//Set mode as central
+	//	unsigned char buffer1[] = "SR,80000000";
+	//	buffer1[11] = '\r';
+	//	HAL_UART_Transmit(&s_UART1Handle, buffer1, sizeof(buffer1), HAL_MAX_DELAY);
+	////	HAL_Delay(1000);
+	//	HAL_UART_Receive(&s_UART1Handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+	//	HAL_Delay(1000);
 
-	//Setup UART2
-	/*Configure GPIO pins : PA2 PA3 */
-	GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		//Reboot
+	//	uint8_t buffer2[] = "R,1";
+	//
+	//	HAL_UART_Transmit(&s_UART1Handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
+	HAL_Delay(5000);
+}
+void init_dice(){
 
-	Util::raspi_handle.Instance	 	 = USART2;
-	Util::raspi_handle.Init.BaudRate	 = 115200;
-	Util::raspi_handle.Init.WordLength = UART_WORDLENGTH_8B;
-	Util::raspi_handle.Init.StopBits	 = UART_STOPBITS_1;
-	Util::raspi_handle.Init.Parity	 = UART_PARITY_NONE;
-	Util::raspi_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
-	Util::raspi_handle.Init.Mode	   	 = UART_MODE_TX_RX;
+	//Connect to Die 1
+	uint8_t sbuffer[] = "E,1,DE1030E87B1D";
+	uint8_t rbuffer[3];
+	uint8_t status[] = "Connecting to Die 1\r\n";
+	sbuffer[16] = '\r';
 
-	if (HAL_UART_Init(&Util::raspi_handle) != HAL_OK)
-		asm("bkpt 255");
-
-	//Setup UART1
-	/*Configure GPIO pins : PA9 PA10 */
-	GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	Util::rn4020_handle.Instance	 	 = USART1;
-	Util::rn4020_handle.Init.BaudRate	 = 115200;
-	Util::rn4020_handle.Init.WordLength = UART_WORDLENGTH_8B;
-	Util::rn4020_handle.Init.StopBits	 = UART_STOPBITS_1;
-	Util::rn4020_handle.Init.Parity	 = UART_PARITY_NONE;
-	Util::rn4020_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
-	Util::rn4020_handle.Init.Mode	   	 = UART_MODE_TX_RX;
-
-	if (HAL_UART_Init(&Util::rn4020_handle) != HAL_OK)
-		asm("bkpt 255");
+	do{
+		HAL_UART_Transmit(&Util::raspi_handle, status, sizeof(status), HAL_MAX_DELAY);
+		HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
+		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+		HAL_Delay(1000);
+	} while(rbuffer[0] == 'E');
 }
