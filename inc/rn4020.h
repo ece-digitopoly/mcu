@@ -6,4 +6,6 @@
 
 void init_rn4020();
 void init_dice();
+uint8_t get_die1_roll();
+
 #endif

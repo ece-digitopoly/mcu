@@ -9,13 +9,23 @@ C_SRCS += \
 ../src/system_stm32f4xx.c 
 
 CPP_SRCS += \
+../src/Profile.cpp \
+../src/Property.cpp \
 ../src/Util.cpp \
 ../src/main.cpp \
+../src/play.cpp \
+../src/properties.cpp \
+../src/raspi.cpp \
 ../src/rn4020.cpp 
 
 OBJS += \
+./src/Profile.o \
+./src/Property.o \
 ./src/Util.o \
 ./src/main.o \
+./src/play.o \
+./src/properties.o \
+./src/raspi.o \
 ./src/rn4020.o \
 ./src/stm32f4xx_it.o \
 ./src/syscalls.o \
@@ -27,8 +37,13 @@ C_DEPS += \
 ./src/system_stm32f4xx.d 
 
 CPP_DEPS += \
+./src/Profile.d \
+./src/Property.d \
 ./src/Util.d \
 ./src/main.d \
+./src/play.d \
+./src/properties.d \
+./src/raspi.d \
 ./src/rn4020.d 
 
 

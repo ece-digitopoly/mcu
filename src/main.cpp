@@ -13,17 +13,9 @@
 #include "stm32f4_discovery.h"
 #include "../inc/Util.h"
 #include "../inc/rn4020.h"
+#include "../inc/raspi.h"
+#include "../inc/play.h"
 			
-void scrollDown(){
-	uint8_t buffer[] = "{\"action\": \"scroll\", \"direction\": \"down\"}\r\n";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
-}
-
-void scrollUp(){
-	uint8_t buffer[] = "{\"action\": \"scroll\", \"direction\": \"up\"}\r\n";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
-}
-
 void Error_Handler(){
 	for(;;);
 }
@@ -99,11 +91,11 @@ void init_uart(){
 	//UART1 = RN4020
 	//UART2 = Raspberry Pi
 
-	Util::raspi_handle.Instance	 	 = USART2;
+	Util::raspi_handle.Instance	 	 	 = USART2;
 	Util::raspi_handle.Init.BaudRate	 = 115200;
-	Util::raspi_handle.Init.WordLength = UART_WORDLENGTH_8B;
+	Util::raspi_handle.Init.WordLength 	 = UART_WORDLENGTH_8B;
 	Util::raspi_handle.Init.StopBits	 = UART_STOPBITS_1;
-	Util::raspi_handle.Init.Parity	 = UART_PARITY_NONE;
+	Util::raspi_handle.Init.Parity	     = UART_PARITY_NONE;
 	Util::raspi_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
 	Util::raspi_handle.Init.Mode	   	 = UART_MODE_TX_RX;
 
@@ -112,9 +104,9 @@ void init_uart(){
 
 	Util::rn4020_handle.Instance	 	 = USART1;
 	Util::rn4020_handle.Init.BaudRate	 = 115200;
-	Util::rn4020_handle.Init.WordLength = UART_WORDLENGTH_8B;
+	Util::rn4020_handle.Init.WordLength  = UART_WORDLENGTH_8B;
 	Util::rn4020_handle.Init.StopBits	 = UART_STOPBITS_1;
-	Util::rn4020_handle.Init.Parity	 = UART_PARITY_NONE;
+	Util::rn4020_handle.Init.Parity	     = UART_PARITY_NONE;
 	Util::rn4020_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
 	Util::rn4020_handle.Init.Mode	   	 = UART_MODE_TX_RX;
 
@@ -136,23 +128,16 @@ int main(void)
 	init_gpio();
 	init_uart();
 
-	uint8_t rbuffer[3];
-
 	init_dice();
 
-	uint8_t buffer4[] = "CURV,2A19";
-	buffer4[9] = '\r';
+	play();
 
-	uint8_t obuffer[5];
 	uint8_t sbuffer[] = "Dice Roll: X\r\n";
+	uint8_t dice_roll = 0;
 
 	for(;;){
-		//Read value
-		HAL_UART_Transmit(&Util::rn4020_handle, buffer4, sizeof(buffer4), HAL_MAX_DELAY);
-		//Receive value
-		HAL_UART_Receive(&Util::rn4020_handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
-		HAL_Delay(10);
-		sbuffer[11] = obuffer[4];
+		dice_roll = get_die1_roll();
+		sbuffer[11] = dice_roll;
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 		HAL_UART_Transmit(&Util::raspi_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 		HAL_Delay(50);

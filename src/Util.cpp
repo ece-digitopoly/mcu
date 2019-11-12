@@ -18,3 +18,4 @@ Util::~Util() {
 
 UART_HandleTypeDef Util::rn4020_handle;
 UART_HandleTypeDef Util::raspi_handle;
+Property* Util::properties[40];

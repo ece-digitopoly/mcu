@@ -62,7 +62,8 @@ src/main.o: ../src/main.cpp \
  C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
  C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_hcd.h \
  C:/Users/shankak/workspace/dice_test/Utilities/STM32F4-Discovery/stm32f4_discovery.h \
- ../src/../inc/Util.h
+ ../src/../inc/Util.h ../src/../inc/Property.h ../src/../inc/Profile.h \
+ ../src/../inc/rn4020.h ../src/../inc/raspi.h ../src/../inc/play.h
 
 C:/Users/shankak/workspace/dice_test/CMSIS/device/stm32f4xx.h:
 
@@ -191,3 +192,13 @@ C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_hcd.h:
 C:/Users/shankak/workspace/dice_test/Utilities/STM32F4-Discovery/stm32f4_discovery.h:
 
 ../src/../inc/Util.h:
+
+../src/../inc/Property.h:
+
+../src/../inc/Profile.h:
+
+../src/../inc/rn4020.h:
+
+../src/../inc/raspi.h:
+
+../src/../inc/play.h:

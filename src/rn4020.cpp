@@ -16,13 +16,15 @@ void init_rn4020(){
 	//	HAL_UART_Transmit(&s_UART1Handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
 	HAL_Delay(5000);
 }
-void init_dice(){
 
+void init_dice(){
 	//Connect to Die 1
 	uint8_t sbuffer[] = "E,1,DE1030E87B1D";
+	sbuffer[16] = '\r';
+
 	uint8_t rbuffer[3];
 	uint8_t status[] = "Connecting to Die 1\r\n";
-	sbuffer[16] = '\r';
+	uint8_t connected[] = "Connected to Die 1!\r\n";
 
 	do{
 		HAL_UART_Transmit(&Util::raspi_handle, status, sizeof(status), HAL_MAX_DELAY);
@@ -30,4 +32,20 @@ void init_dice(){
 		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
 		HAL_Delay(1000);
 	} while(rbuffer[0] == 'E');
+
+	HAL_UART_Transmit(&Util::raspi_handle, connected, sizeof(connected), HAL_MAX_DELAY);
+}
+
+uint8_t get_die1_roll(){
+	uint8_t sbuffer[] = "CURV,2A19";
+	sbuffer[9] = '\r';
+
+	uint8_t obuffer[5];
+	//Read value
+	HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
+	//Receive value
+	HAL_UART_Receive(&Util::rn4020_handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
+	HAL_Delay(10);
+
+	return obuffer[4];
 }

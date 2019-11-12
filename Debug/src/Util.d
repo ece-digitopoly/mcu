@@ -62,7 +62,9 @@ src/Util.o: ../src/Util.cpp \
  C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
  C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_hcd.h \
- C:/Users/shankak/workspace/dice_test/Utilities/STM32F4-Discovery/stm32f4_discovery.h
+ C:/Users/shankak/workspace/dice_test/Utilities/STM32F4-Discovery/stm32f4_discovery.h \
+ C:/Users/shankak/workspace/dice_test/inc/Property.h \
+ C:/Users/shankak/workspace/dice_test/inc/Profile.h
 
 C:/Users/shankak/workspace/dice_test/inc/Util.h:
 
@@ -191,3 +193,7 @@ C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
 C:/Users/shankak/workspace/dice_test/HAL_Driver/Inc/stm32f4xx_hal_hcd.h:
 
 C:/Users/shankak/workspace/dice_test/Utilities/STM32F4-Discovery/stm32f4_discovery.h:
+
+C:/Users/shankak/workspace/dice_test/inc/Property.h:
+
+C:/Users/shankak/workspace/dice_test/inc/Profile.h:

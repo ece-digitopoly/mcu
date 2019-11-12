@@ -10,6 +10,7 @@
 
 #include "stm32f4xx.h"
 #include "stm32f4_discovery.h"
+#include "Property.h"
 
 class Util {
 public:
@@ -17,6 +18,7 @@ public:
 	virtual ~Util();
 	static UART_HandleTypeDef rn4020_handle;
 	static UART_HandleTypeDef raspi_handle;
+	static Property* properties[40];
 };
 
 #endif /* UTIL_H_ */
