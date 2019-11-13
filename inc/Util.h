@@ -19,6 +19,10 @@ public:
 	static UART_HandleTypeDef rn4020_handle;
 	static UART_HandleTypeDef raspi_handle;
 	static Property* properties[40];
+	static Profile* current_player;
+	static Profile* players[4];
+	static int max_players;
+	static int current_player_index;
 };
 
 #endif /* UTIL_H_ */

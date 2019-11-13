@@ -55,3 +55,7 @@ Property::Property(int position){
 Property::~Property() {
 	// TODO Auto-generated destructor stub
 }
+
+int Property::getCurrentRent(){
+	return property_rents[num_houses];
+}

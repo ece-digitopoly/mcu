@@ -9,8 +9,10 @@ C_SRCS += \
 ../src/system_stm32f4xx.c 
 
 CPP_SRCS += \
+../src/Action.cpp \
 ../src/Profile.cpp \
 ../src/Property.cpp \
+../src/PropertyAction.cpp \
 ../src/Util.cpp \
 ../src/main.cpp \
 ../src/play.cpp \
@@ -19,8 +21,10 @@ CPP_SRCS += \
 ../src/rn4020.cpp 
 
 OBJS += \
+./src/Action.o \
 ./src/Profile.o \
 ./src/Property.o \
+./src/PropertyAction.o \
 ./src/Util.o \
 ./src/main.o \
 ./src/play.o \
@@ -37,8 +41,10 @@ C_DEPS += \
 ./src/system_stm32f4xx.d 
 
 CPP_DEPS += \
+./src/Action.d \
 ./src/Profile.d \
 ./src/Property.d \
+./src/PropertyAction.d \
 ./src/Util.d \
 ./src/main.d \
 ./src/play.d \

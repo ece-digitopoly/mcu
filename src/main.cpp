@@ -114,6 +114,15 @@ void init_uart(){
 		asm("bkpt 255");
 }
 
+void init_players(){
+	//initialize players array as well
+	Util::max_players = 2;
+	for(int i = 0; i < Util::max_players; i++){
+		Util::players[i] = new Profile(i + 1);
+	}
+	Util::current_player = Util::players[0];
+}
+
 int main(void)
 {
 	HAL_Init();
@@ -128,7 +137,8 @@ int main(void)
 	init_gpio();
 	init_uart();
 
-	init_dice();
+//	init_dice();
+	init_players();
 
 	play();
 

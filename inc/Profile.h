@@ -12,7 +12,8 @@ class Profile {
 public:
 	int position;//will also have num utilities and num stations
 	int money;
-	Profile();
+	int number;
+	Profile(int);
 	virtual ~Profile();
 };
 

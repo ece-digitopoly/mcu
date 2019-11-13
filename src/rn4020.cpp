@@ -31,12 +31,13 @@ void init_dice(){
 		HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
 		HAL_Delay(1000);
-	} while(rbuffer[0] == 'E');
+	} while(rbuffer[0] == 'E'); //look for not aok
 
 	HAL_UART_Transmit(&Util::raspi_handle, connected, sizeof(connected), HAL_MAX_DELAY);
 }
 
 uint8_t get_die1_roll(){
+	return 49;
 	uint8_t sbuffer[] = "CURV,2A19";
 	sbuffer[9] = '\r';
 
@@ -47,5 +48,8 @@ uint8_t get_die1_roll(){
 	HAL_UART_Receive(&Util::rn4020_handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
 	HAL_Delay(10);
 
+	//Check if err. If so, have a while loop to restart connection.
+	//Send a message to Pi that we're restarting connection with die X
 	return obuffer[4];
+
 }

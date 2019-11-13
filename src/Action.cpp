@@ -1,19 +1,17 @@
 /*
- * Profile.cpp
+ * Action.cpp
  *
  *  Created on: Sep 23, 2019
  *      Author: shankak
  */
 
-#include "Profile.h"
+#include "Action.h"
 
-Profile::Profile(int number) {
+Action::Action() {
 	// TODO Auto-generated constructor stub
-	position = 0;
-	money = 1500;
-	this->number = number;
+
 }
 
-Profile::~Profile() {
+Action::~Action() {
 	// TODO Auto-generated destructor stub
 }
