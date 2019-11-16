@@ -15,6 +15,7 @@
 #include "../inc/rn4020.h"
 #include "../inc/raspi.h"
 #include "../inc/play.h"
+#include "../inc/motors.h"
 			
 void Error_Handler(){
 	for(;;);
@@ -85,6 +86,132 @@ void init_gpio(){
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	//Motor 1 is the second pin and motor 2 is the first
+	//Motor Enables
+	GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_8;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	//Motor Steps
+	GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_7;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	//Motor Dirs
+	GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+
+	//Electromagnet Transistor
+	GPIO_InitStruct.Pin = GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+}
+
+static void tim3_init(void){
+	TIM_HandleTypeDef htim3;
+
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	htim3.Instance = TIM3;
+	htim3.Init.Prescaler = 899; // 4 kHz (hwclk/((psc + 1)*(arr + 1)))
+	htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim3.Init.Period = 9;
+	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+//  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+
+	if (HAL_TIM_OC_Init(&htim3) != HAL_OK){
+		Error_Handler();
+	}
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC1REF;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK){
+    	Error_Handler();
+    }
+    sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_OC_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK){
+    	Error_Handler();
+    }
+    if (HAL_TIM_Base_Start_IT(&htim3) != HAL_OK){
+    	Error_Handler();
+    }
+    if (HAL_TIM_OC_Start(&htim3, TIM_CHANNEL_1) != HAL_OK){
+    	Error_Handler();
+    }
+
+// 	HAL_TIM_MspPostInit(&htim3);
+
+}
+
+static void tim4_init(void){
+	TIM_HandleTypeDef htim4;
+
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	htim4.Instance = TIM4;
+	htim4.Init.Prescaler = 899;
+	htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim4.Init.Period = 9;
+	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+//  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+	if (HAL_TIM_OC_Init(&htim4) != HAL_OK){
+		Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC2REF;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK){
+		Error_Handler();
+	}
+	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
+	sConfigOC.Pulse = 0;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK){
+		Error_Handler();
+	}
+	if (HAL_TIM_Base_Start_IT(&htim4) != HAL_OK){
+		Error_Handler();
+	}
+	if (HAL_TIM_OC_Start(&htim4, TIM_CHANNEL_2) != HAL_OK){
+		Error_Handler();
+	}
+//  HAL_TIM_MspPostInit(&htim4);
+}
+
+
+void TIM4_IRQHandler (void){
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	TIM4 -> SR &= ~TIM_SR_CC2IF;
+	TIM4 -> SR &= ~TIM_SR_UIF;
+}
+
+void TIM3_IRQHandler (void){
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+	TIM3 -> SR &= ~TIM_SR_CC1IF;
+	TIM3 -> SR &= ~TIM_SR_UIF;
+}
+
+
+void init_tim(){
+	HAL_NVIC_SetPriority(TIM4_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(TIM4_IRQn);
+
+	HAL_NVIC_SetPriority(TIM3_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(TIM3_IRQn);
+
+	tim4_init();
+	tim3_init();
 }
 
 void init_uart(){
@@ -133,24 +260,23 @@ int main(void)
 	__USART2_CLK_ENABLE();
 	__GPIOA_CLK_ENABLE();
 	__GPIOB_CLK_ENABLE();
+	__GPIOC_CLK_ENABLE();
+	__TIM3_CLK_ENABLE();
+	__TIM4_CLK_ENABLE();
 
 	init_gpio();
 	init_uart();
+	init_tim();
+
 
 //	init_dice();
 	init_players();
+	init_motors();
 
-	play();
-
-	uint8_t sbuffer[] = "Dice Roll: X\r\n";
-	uint8_t dice_roll = 0;
+//	play();
+	move_piece(0, 5);
 
 	for(;;){
-		dice_roll = get_die1_roll();
-		sbuffer[11] = dice_roll;
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-		HAL_UART_Transmit(&Util::raspi_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
-		HAL_Delay(50);
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+
 	}
 }
