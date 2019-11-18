@@ -16,7 +16,7 @@ void move_n_steps_x(int n){
 	//Enable Motor x
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
 	for(int i = 0; i < n; i++){
-		HAL_Delay(1000);
+		HAL_Delay(960); //920 for the magnet moving bar, 960 for the wider bar motor
 	}
 	//Disable Motor x
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);

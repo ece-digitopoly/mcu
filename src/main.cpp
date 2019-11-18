@@ -17,6 +17,19 @@
 #include "../inc/play.h"
 #include "../inc/motors.h"
 			
+extern "C" {
+	void TIM4_IRQHandler (void){
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+		TIM4 -> SR &= ~TIM_SR_CC2IF;
+		TIM4 -> SR &= ~TIM_SR_UIF;
+	}
+
+	void TIM3_IRQHandler (void){
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+		TIM3 -> SR &= ~TIM_SR_CC1IF;
+		TIM3 -> SR &= ~TIM_SR_UIF;
+	}
+}
 void Error_Handler(){
 	for(;;);
 }
@@ -190,17 +203,7 @@ static void tim4_init(void){
 }
 
 
-void TIM4_IRQHandler (void){
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	TIM4 -> SR &= ~TIM_SR_CC2IF;
-	TIM4 -> SR &= ~TIM_SR_UIF;
-}
 
-void TIM3_IRQHandler (void){
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
-	TIM3 -> SR &= ~TIM_SR_CC1IF;
-	TIM3 -> SR &= ~TIM_SR_UIF;
-}
 
 
 void init_tim(){
@@ -274,9 +277,11 @@ int main(void)
 	init_motors();
 
 //	play();
-	move_piece(0, 5);
+//	move_piece(0, 5);
+	move_n_steps_x(1);
 
 	for(;;){
-
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+		HAL_Delay(500);
 	}
 }

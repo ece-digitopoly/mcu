@@ -6,4 +6,5 @@
 
 void init_motors();
 void move_piece(int a, int b);
+void move_n_steps_x(int n);
 #endif
