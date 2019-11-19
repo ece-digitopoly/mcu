@@ -34,7 +34,7 @@ void move_n_steps_y(int n){
 	//Enable Motor y
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
 	for(int i = 0; i < n; i++){
-		HAL_Delay(1000);
+		HAL_Delay(920);
 	}
 	//Disable Motor y
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
@@ -72,20 +72,21 @@ int get_col(int n){
 		return 40 - n;
 	}
 }
-void move_to_from(int a, int b){
-	move_n_steps_x(get_row(a) - get_row(b));
-	move_n_steps_y(get_col(a) - get_col(b));
+void move_from_to(int a, int b){
+	move_n_steps_x(get_row(b) - get_row(a));
+//	move_n_steps_y(get_col(b) - get_col(a));
 }
 
 void move_piece(int a, int b){
-	move_to_from(a, 0);
+	move_from_to(0, a);
 	//Enable Electromagnet
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-
-	move_to_from(b, a);
-
+	HAL_Delay(500);
+	move_from_to(a, b);
+	HAL_Delay(500);
 	//Disable Electromagnet
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
 
-	move_to_from(b, 0);
+	move_from_to(b, 0);
+	HAL_Delay(500);
 }

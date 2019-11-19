@@ -22,6 +22,7 @@ public:
 	static Profile* current_player;
 	static Profile* players[4];
 	static int max_players;
+	static bool action_complete;
 	static int current_player_index;
 };
 

@@ -6,5 +6,6 @@
 
 void scrollUp();
 void scrollDown();
+int sendDiceRoll();
 
 #endif

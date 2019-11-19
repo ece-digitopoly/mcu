@@ -277,8 +277,8 @@ int main(void)
 	init_motors();
 
 //	play();
-//	move_piece(0, 5);
-	move_n_steps_x(1);
+	move_piece(1, 3);
+//	move_n_steps_x(1);
 
 	for(;;){
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
