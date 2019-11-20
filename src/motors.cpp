@@ -86,7 +86,7 @@ void move_piece(int a, int b){
 	HAL_Delay(500);
 	//Disable Electromagnet
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
-
+	HAL_Delay(1000);
 	move_from_to(b, 0);
 	HAL_Delay(500);
 }

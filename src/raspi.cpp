@@ -34,3 +34,8 @@ int sendDiceRoll(){
 
 	return die1_roll_int;
 }
+
+void click(){
+	uint8_t buffer[] = "{\"action\": \"click\"}\r\n";
+	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
+}
