@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    main.c
+  * @file    main.cpp
   * @author  Ac6
   * @version V1.0
   * @date    01-December-2013
@@ -16,7 +16,12 @@
 #include "../inc/raspi.h"
 #include "../inc/play.h"
 #include "../inc/motors.h"
-			
+
+bool compareCodes2(char * buffer1, char * buffer2){
+	if(buffer1[0] == buffer2[0] && buffer1[1] == buffer2[1] && buffer1[2] == buffer2[2]) return true;
+	return false;
+}
+
 extern "C" {
 	void TIM4_IRQHandler (void){
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
@@ -46,6 +51,57 @@ extern "C" {
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+	}
+
+//	uint8_t xbuffer[3];
+
+	void USART2_IRQHandler(void)  {
+//		__HAL_UART_FLUSH_DRREGISTER (&Util::raspi_handle);
+
+		HAL_UART_IRQHandler(&Util::raspi_handle);
+
+		Util::rx_buffer[Util::rx_buf_index++] = Util::raspi_handle.Instance->DR;
+
+		if (Util::rx_buf_index == 3) {
+			Util::rx_done = true;
+			Util::rx_buf_index = 0;
+		}
+
+//		HAL_UART_Receive (&Util::raspi_handle, xbuffer, sizeof (xbuffer), HAL_MAX_DELAY);
+//		USART2 -> SR &= ~(1 << 5);	//clears rxne
+//		LL_GPIO_SetPinSpeed (2, 3,5);
+
+//		if(compareCodes2((char *) xbuffer, "STR")) {
+//			HAL_Delay (3000);
+//			uint8_t buffer4[] = "{\"action\": \"dicerolling\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer4, sizeof(buffer4), HAL_MAX_DELAY);
+//			HAL_Delay (2000);
+//
+//			uint8_t buffer5[] = "{\"action\": \"diceroll\", \"roll\": \"3\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer5, sizeof(buffer5), HAL_MAX_DELAY);
+//			HAL_Delay (2000);
+//
+//			uint8_t buffer6[] = "{\"action\": \"dialog\", \"options\": [\"Buy\", \"Ignore\"], \"text\": \"This property is unowned.\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer6, sizeof(buffer6), HAL_MAX_DELAY);
+//		//	HAL_Delay (2000);
+//
+////			move_piece(1, 4);
+//
+//			HAL_Delay (1000);
+//			uint8_t buffer7[] = "{\"action\": \"piecemoved\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer7, sizeof(buffer7), HAL_MAX_DELAY);
+//		}
+//		else if (compareCodes2((char *) xbuffer, "BUY")) {
+//			uint8_t buffer8[] = "{\"action\": \"update\", \"property\": \"3\", \"player\": \"0\", \"text\": \"This property is unowned.\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer8, sizeof(buffer8), HAL_MAX_DELAY);
+//			HAL_Delay (500);
+//			uint8_t buffer9[] = "{\"action\": \"update\", \"player\": \"0\", \"money\": \"1400\"}";
+//			HAL_UART_Transmit(&Util::raspi_handle, buffer9, sizeof(buffer9), HAL_MAX_DELAY);
+//		}
+
+//		HAL_UART_Receive_IT (&Util::raspi_handle, xbuffer, sizeof (xbuffer));
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
+		__HAL_UART_ENABLE_IT(&Util::raspi_handle, UART_IT_RXNE);
 	}
 }
 void Error_Handler(){
@@ -252,6 +308,8 @@ void init_uart(){
 	Util::raspi_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
 	Util::raspi_handle.Init.Mode	   	 = UART_MODE_TX_RX;
 
+	__HAL_UART_ENABLE_IT(&Util::raspi_handle, UART_IT_RXNE);
+
 	if (HAL_UART_Init(&Util::raspi_handle) != HAL_OK)
 		asm("bkpt 255");
 
@@ -263,8 +321,16 @@ void init_uart(){
 	Util::rn4020_handle.Init.HwFlowCtl	 = UART_HWCONTROL_NONE;
 	Util::rn4020_handle.Init.Mode	   	 = UART_MODE_TX_RX;
 
+//	__HAL_UART_ENABLE_IT(&Util::rn4020_handle, UART_IT_RXNE);
+
 	if (HAL_UART_Init(&Util::rn4020_handle) != HAL_OK)
 		asm("bkpt 255");
+
+	HAL_NVIC_SetPriority(USART2_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(USART2_IRQn);
+
+	HAL_NVIC_SetPriority(USART1_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(USART1_IRQn);
 }
 
 void init_players(){
@@ -274,12 +340,6 @@ void init_players(){
 		Util::players[i] = new Profile(i + 1);
 	}
 	Util::current_player = Util::players[0];
-}
-
-
-bool compareCodes2(char * buffer1, char * buffer2){
-	if(buffer1[0] == buffer2[0] && buffer1[1] == buffer2[1] && buffer1[2] == buffer2[2]) return true;
-	return false;
 }
 
 int main(void)
@@ -310,7 +370,7 @@ int main(void)
 	init_players();
 	init_motors();
 
-//	play();
+	play();
 
 //	move_n_steps_x(1);
 
@@ -320,8 +380,14 @@ int main(void)
 //	HAL_UART_Transmit(&Util::raspi_handle, buffer1, sizeof(buffer1), HAL_MAX_DELAY);
 //	HAL_Delay (3000);
 //
-//	uint8_t buffer2[] = "{\"action\": \"scroll\", \"direction\": \"down\"}";
-//	HAL_UART_Transmit(&Util::raspi_handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
+	uint8_t buffer2[] = "{\"action\": \"scroll\", \"direction\": \"down\"}";
+	HAL_UART_Transmit(&Util::raspi_handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
+
+//	uint8_t xbuffer[3];
+//	HAL_UART_Receive_IT (&Util::raspi_handle, xbuffer, sizeof (xbuffer));
+//	HAL_Delay(100);
+
+//	HAL_UART_Receive (&Util::raspi_handle, xbuffer, sizeof (xbuffer), HAL_MAX_DELAY);
 //	HAL_Delay (1000);
 //	HAL_UART_Transmit(&Util::raspi_handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
 //	HAL_Delay (1000);
@@ -332,62 +398,30 @@ int main(void)
 //	HAL_UART_Transmit(&Util::raspi_handle, buffer3, sizeof(buffer3), HAL_MAX_DELAY);
 //	HAL_Delay (3000);
 
-	uint8_t rbuffer[3];
-	HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), 100);
+	// uint8_t rbuffer[3];
+	// HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), 100);
 
-	while(!compareCodes2((char *) rbuffer, "STR"))
-	{
-//		if(compareCodes2((char *) rbuffer, "STR")){
-//			HAL_Delay (2000);
-//			break;
-//		}
-//		HAL_Delay (500);
-		HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), 100);
-	}
+	// while(!compareCodes2((char *) rbuffer, "STR"))
+	// {
 
-	uint8_t buffer4[] = "{\"action\": \"dicerolling\"}";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer4, sizeof(buffer4), HAL_MAX_DELAY);
-	HAL_Delay (2000);
-
-	uint8_t buffer5[] = "{\"action\": \"diceroll\", \"roll\": \"3\"}";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer5, sizeof(buffer5), HAL_MAX_DELAY);
-	HAL_Delay (2000);
-
-	uint8_t buffer6[] = "{\"action\": \"dialog\", \"options\": [\"Buy\", \"Ignore\"], \"text\": \"This property is unowned.\"}";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer6, sizeof(buffer6), HAL_MAX_DELAY);
-//	HAL_Delay (2000);
-
-	move_piece(1, 4);
-
-	HAL_Delay (1000);
-	uint8_t buffer7[] = "{\"action\": \"piecemoved\"}";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer7, sizeof(buffer7), HAL_MAX_DELAY);
-	HAL_Delay (500);
 
 //	uint8_t rbuffer[3];
-	HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+	// HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+			// while(1){
+			// 	if(compareCodes2((char *) rbuffer, "BUY")){
 
-
-			while(1){
-				if(compareCodes2((char *) rbuffer, "BUY")){
-					uint8_t buffer8[] = "{\"action\": \"update\", \"property\": \"3\", \"player\": \"0\", \"text\": \"This property is unowned.\"}";
-					HAL_UART_Transmit(&Util::raspi_handle, buffer8, sizeof(buffer8), HAL_MAX_DELAY);
-					HAL_Delay (500);
-					uint8_t buffer9[] = "{\"action\": \"update\", \"player\": \"0\", \"money\": \"1400\"}";
-					HAL_UART_Transmit(&Util::raspi_handle, buffer9, sizeof(buffer9), HAL_MAX_DELAY);
-					break;
-				}
-				HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
-				HAL_Delay(100);
-			}
+			// 	}
+			// 	HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+			// 	HAL_Delay(100);
+			// }
 
 
 //	HAL_Delay (2000);
 
 
 	for(;;){
+
 //		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 //		HAL_Delay(500);
 	}
 }
-
