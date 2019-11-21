@@ -18,6 +18,9 @@ public:
 	virtual ~Util();
 	static UART_HandleTypeDef rn4020_handle;
 	static UART_HandleTypeDef raspi_handle;
+	static uint8_t rx_buffer[3];
+	static int rx_buf_index;
+	static bool rx_done;
 	static Property* properties[40];
 	static Profile* current_player;
 	static Profile* players[4];
