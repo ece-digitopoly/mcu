@@ -40,7 +40,7 @@ void getPropertyAction(int position){
 		}
 	}
 	else{
-		uint8_t buffer[] = "{\"action\": \"dialog\", \"options\": [\"Buy\", \"Pass\"], \"text\": \"This property is unowned.\"}\r\n";
+		uint8_t buffer[] = "{\"action\": \"dialog\", \"options\": [\"Buy\", \"Ignore\"], \"text\": \"This property is unowned.\"}\r\n";
 		HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 	}
 }
@@ -49,7 +49,7 @@ void getBuyAction(int position){
 	Property* property = Util::properties[position];
 
 	if(Util::current_player->money <= property->cost){
-		uint8_t buffer[] = "{\"action\": \"dialog\", \"options\": [\"Mortgage\", \"Pass\"], \"text\": \"You don't have enough funds.\"}\r\n";
+		uint8_t buffer[] = "{\"action\": \"dialog\", \"options\": [\"Mortgage\", \"Ignore\"], \"text\": \"You don't have enough funds.\"}\r\n";
 		HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 	}
 	else{
@@ -57,7 +57,7 @@ void getBuyAction(int position){
 		property->owner = Util::current_player;
 		property->owned = true;
 		uint8_t buffer[105];
-        sprintf((char*) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"property\": \"%d\", \"text\": \"Player X has bought the property!\"}\r\n", Util::current_player_index+1, position);
+        sprintf((char*) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"property\": \"%d\", \"text\": \"Player X has bought the property!\"}\r\n", Util::current_player_index, position);
 		HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 		Util::action_complete = true;
 	}
@@ -89,7 +89,7 @@ void movePlayer(Profile* player, int dice_roll){
 	}
 
 //	int move_successful;
-	move_piece(player->position, new_position);
+//	move_piece(player->position, new_position);
 	//Error handling for move
 
 	player->position = new_position;
@@ -121,39 +121,67 @@ void play(){
 	int dice_roll = 0;
 
 	for(;;){
+		while (!Util::rx_done);
+		Util::rx_done = false;
+
+		while(true){
+			if(compareCodes((char *) Util::rx_buffer, "STR")){
+				break;
+			}
+//			HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+			while (!Util::rx_done);
+			Util::rx_done = false;
+			HAL_Delay(100);
+		}
+
+		HAL_Delay(1000);
+
 		//Send dicerolling and dice_roll actions
 		dice_roll = sendDiceRoll();
 
 		//Move player to new spot
 		movePlayer(Util::current_player, dice_roll);
 
+		getNewAction(Util::current_player->position);
+		HAL_Delay (500);
 		//Send piecemoved action
 		HAL_UART_Transmit(&Util::raspi_handle, piece_moved, sizeof(piece_moved), HAL_MAX_DELAY);
+		HAL_Delay (500);
 
-		getNewAction(Util::current_player->position);
+//		HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+		while (!Util::rx_done);
+		Util::rx_done = false;
 
-		HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
-
-		while(!Util::action_complete){
-			if(compareCodes((char *) rbuffer, "BUY")){
+		while(true){
+			if (compareCodes((char *) Util::rx_buffer, "BUY")){
 				getBuyAction(Util::current_player->position);
+				break;
 			}
-			HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+			else if (compareCodes((char *) Util::rx_buffer, "IGN")){
+				break;
+			}
+//			HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+			while (!Util::rx_done);
+			Util::rx_done = false;
 			HAL_Delay(100);
 		}
+
+		HAL_Delay (100);
 
 		HAL_UART_Transmit(&Util::raspi_handle, main_phase, sizeof(main_phase), HAL_MAX_DELAY);
-		HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+//		HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+		while (!Util::rx_done);
+		Util::rx_done = false;
 
-		Util::action_complete = false;
+//		Util::action_complete = false;
 
-		while(!compareCodes((char *) rbuffer, "END")){
-			if(compareCodes((char *) rbuffer, "TR1")){
-				getTradeAction(1);
-			}
-			HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
-			HAL_Delay(100);
-		}
-		goToNextPlayer(1, 0); //supposed to be die2_roll instead of 0
+//		while(!compareCodes((char *) rbuffer, "END")){
+//			if(compareCodes((char *) rbuffer, "TR1")){
+//				getTradeAction(1);
+//			}
+//			HAL_UART_Receive(&Util::raspi_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+//			HAL_Delay(100);
+//		}
+//		goToNextPlayer(1, 0); //supposed to be die2_roll instead of 0
 	}
 }
