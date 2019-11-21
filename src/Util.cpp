@@ -24,3 +24,6 @@ Profile* Util::current_player;
 int Util::current_player_index = 0;
 int Util::max_players = 4;
 bool Util::action_complete = false;
+int Util::rx_buf_index = 0;
+uint8_t Util::rx_buffer[3] = {0};
+bool Util::rx_done = false;
