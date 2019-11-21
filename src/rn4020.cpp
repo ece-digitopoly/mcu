@@ -38,7 +38,7 @@ void init_dice(){
 
 uint8_t get_die1_roll(){
 	HAL_Delay(3000);
-	return 49;
+	return 51;
 	uint8_t sbuffer[] = "CURV,2A19";
 	sbuffer[9] = '\r';
 
