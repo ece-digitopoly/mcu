@@ -40,7 +40,7 @@ void init_properties(){
 	Util::properties[6] = new Property(6, 0, 100, 50, 55, 50, prop_rents, 1);
 
 	//Chance
-	Util::properties[7] = new Property(7);
+	Util::properties[7] = new Property(7, 3);
 
 	//Vermont Avenue
 	setRents(prop_rents, 6, 30, 90, 270, 400, 550);
@@ -96,7 +96,7 @@ void init_properties(){
 	Util::properties[21] = new Property(21, 0, 220, 110, 121, 150, prop_rents, 4);
 
 	//Chance
-	Util::properties[22] = new Property(22);
+	Util::properties[22] = new Property(22, 3);
 
 	//Indiana Avenue
 	setRents(prop_rents, 18, 90, 250, 700, 875, 1050);
@@ -149,7 +149,7 @@ void init_properties(){
 	Util::properties[35] = new Property(35, 1, 200, 100, 110, 0, prop_rents, 8);
 
 	//Chance
-	Util::properties[36] = new Property(36);
+	Util::properties[36] = new Property(36, 3);
 
 	//Park Place
 	setRents(prop_rents, 35, 175, 500, 1100, 1300, 1500);

@@ -44,6 +44,7 @@ public:
 
 	Property(int, int, int, int, int, int, int property_rents[6], int);
 	Property(int position);
+	Property(int position, int type);
 	virtual ~Property();
 
 	int getCurrentRent();

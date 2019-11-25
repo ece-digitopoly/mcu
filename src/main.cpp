@@ -38,15 +38,20 @@ extern "C" {
 	{
 		if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_5)) {
 			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-					scrollUp();
+			scrollUp();
+			HAL_Delay (220);
 		}
 		else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_6)) {
 			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 					scrollDown();
+//					move_n_steps_x(1);
+					HAL_Delay (220);
 				}
 		else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_7)) {
 			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
 			click();
+//			move_n_steps_x(-1);
+			HAL_Delay (220);
 		}
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
@@ -370,18 +375,19 @@ int main(void)
 	init_players();
 	init_motors();
 
-	play();
+//	move_n_steps_x(1);
+	move_n_steps_x(1);
+
+//	play();
 
 //	move_n_steps_x(1);
-
-
 
 //	uint8_t buffer1[] = "{\"action\": \"click\"}";
 //	HAL_UART_Transmit(&Util::raspi_handle, buffer1, sizeof(buffer1), HAL_MAX_DELAY);
 //	HAL_Delay (3000);
 //
-	uint8_t buffer2[] = "{\"action\": \"scroll\", \"direction\": \"down\"}";
-	HAL_UART_Transmit(&Util::raspi_handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
+//	uint8_t buffer2[] = "{\"action\": \"scroll\", \"direction\": \"down\"}";
+//	HAL_UART_Transmit(&Util::raspi_handle, buffer2, sizeof(buffer2), HAL_MAX_DELAY);
 
 //	uint8_t xbuffer[3];
 //	HAL_UART_Receive_IT (&Util::raspi_handle, xbuffer, sizeof (xbuffer));
