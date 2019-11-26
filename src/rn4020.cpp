@@ -23,34 +23,64 @@ void init_dice(){
 	sbuffer[16] = '\r';
 
 	uint8_t rbuffer[3];
-	uint8_t status[] = "Connecting to Die 1\r\n";
-	uint8_t connected[] = "Connected to Die 1!\r\n";
+//	uint8_t status[] = "Connecting to Die 1\r\n";
+//	uint8_t connected[] = "Connected to Die 1!\r\n";
 
 	do{
-		HAL_UART_Transmit(&Util::raspi_handle, status, sizeof(status), HAL_MAX_DELAY);
-		HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
 		HAL_Delay(1000);
 	} while(rbuffer[0] == 'E'); //look for not aok
 
-	HAL_UART_Transmit(&Util::raspi_handle, connected, sizeof(connected), HAL_MAX_DELAY);
+//	HAL_UART_Transmit(&Util::raspi_handle, connected, sizeof(connected), HAL_MAX_DELAY);
 }
 
-uint8_t get_die1_roll(){
+void connect_die_1(){
+	uint8_t sbuffer[] = "E,1,DE1030E87B1D";
+	sbuffer[16] = '\r';
+
+	uint8_t rbuffer[3];
+//	uint8_t status[] = "Connecting to Die 1\r\n";
+//	uint8_t connected[] = "Connected to Die 1!\r\n";
+	do{
+		HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
+		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+		HAL_Delay(1000);
+	} while(rbuffer[0] == 'E'); //look for not aok
+}
+
+void connect_die_2(){
+	uint8_t sbuffer[] = "E,1,CAB89779A043";
+	sbuffer[16] = '\r';
+
+	uint8_t rbuffer[3];
+//	uint8_t status[] = "Connecting to Die 1\r\n";
+//	uint8_t connected[] = "Connected to Die 1!\r\n";
+	do{
+		HAL_UART_Receive(&Util::rn4020_handle, rbuffer, sizeof(rbuffer), HAL_MAX_DELAY);
+		HAL_Delay(1000);
+	} while(rbuffer[0] == 'E'); //look for not aok
+}
+
+uint8_t get_die_roll(){
 	HAL_Delay(3000);
-	return 54;
 	uint8_t sbuffer[] = "CURV,2A19";
+	uint8_t dbuffer[] = "K";
 	sbuffer[9] = '\r';
+	dbuffer[1] = '\r';
 
 	uint8_t obuffer[5];
+
 	//Read value
 	HAL_UART_Transmit(&Util::rn4020_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 	//Receive value
 	HAL_UART_Receive(&Util::rn4020_handle, obuffer, sizeof(obuffer), HAL_MAX_DELAY);
 	HAL_Delay(10);
-
 	//Check if err. If so, have a while loop to restart connection.
 	//Send a message to Pi that we're restarting connection with die X
+
+	//Disconnect from RN4020 after reading
+	HAL_UART_Transmit(&Util::rn4020_handle, dbuffer, sizeof(dbuffer), HAL_MAX_DELAY);
+	HAL_Delay(10);
 	return obuffer[4];
 
 }

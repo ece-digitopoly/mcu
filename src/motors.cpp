@@ -9,8 +9,41 @@ void init_motors(){
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
 }
 
+void test_move_x (int n) {
+	if (n < 0) {
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+		n = -n;
+	}
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+	for (; n > 0; n--) {
+		HAL_Delay(1); //920 for the magnet moving bar, 960 for the wider bar motor
+	}
+	//Disable Motor x
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+	//Change Dir back to normal
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
+}
+
+void test_move_y (int n) {
+	if (n < 0) {
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_RESET);
+		n = -n;
+	}
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+	for (; n > 0; n--) {
+		HAL_Delay(1); //920 for the magnet moving bar, 960 for the wider bar motor
+	}
+	//Disable Motor x
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+	//Change Dir back to normal
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_9, GPIO_PIN_SET);
+}
+
 void move_n_steps_x(int n){
 	if(n == 0) return;
+	return test_move_x (420 * n);
 	if(n < 0){
 		n = -n;
 		//Change Dir
@@ -29,6 +62,7 @@ void move_n_steps_x(int n){
 
 void move_n_steps_y(int n){
 	if(n == 0) return;
+	return test_move_y (387 * n);
 	if(n < 0){
 		n = -n;
 		//Change Dir
@@ -93,7 +127,7 @@ int get_col(int n){
 void move_from_to(int a, int b){
 	if(Util::current_player_index == 0){
 		move_n_steps_x(get_row_p1(b) - get_row_p1(a));
-	//	move_n_steps_y(get_col_p1(b) - get_col_p1(a));
+//		move_n_steps_y(get_col_p1(b) - get_col_p1(a));
 
 	}
 	else{

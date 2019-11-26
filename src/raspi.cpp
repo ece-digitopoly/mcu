@@ -22,14 +22,19 @@ int sendDiceRoll(){
 
 	HAL_UART_Transmit(&Util::raspi_handle, buffer, sizeof(buffer), HAL_MAX_DELAY);
 
-	uint8_t die1_roll = get_die1_roll();
-	int die1_roll_int = convertCharToInt(die1_roll);
+	connect_die_1();
+	HAL_Delay (100);
+	uint8_t die1_roll = get_die_roll();
+//	connect_die_2();
+//	uint8_t die2_roll = get_die_roll();
 
+	int die1_roll_int = convertCharToInt(die1_roll);
+//	int die2_roll_int = convertCharToInt(die2_roll);
 //	sprintf((char *) sbuffer, "{\"action\": \"diceroll\", \"roll\": %d}", die1_roll_int);
 
 //	HAL_UART_Transmit(&Util::raspi_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 
-	return die1_roll_int;
+	return die1_roll_int;// + die2_roll_int;
 }
 
 void click(){

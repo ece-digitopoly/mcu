@@ -36,26 +36,52 @@ extern "C" {
 	}
 	void EXTI9_5_IRQHandler(void)
 	{
-		if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_5)) {
-			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-			scrollUp();
-			HAL_Delay (220);
+		if (Util::current_player_index == 0) {
+			if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_5)) {
+				scrollUp();
+				HAL_Delay (220);
+			}
+			else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_6)) {
+						scrollDown();
+						HAL_Delay (220);
+					}
+			else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_7)) {
+				click();
+				HAL_Delay (220);
+			}
 		}
-		else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_6)) {
-			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-					scrollDown();
-//					move_n_steps_x(1);
+		else {
+			if (!HAL_GPIO_ReadPin (GPIOD, GPIO_PIN_8)) {
+					scrollUp();
 					HAL_Delay (220);
 				}
-		else if (!HAL_GPIO_ReadPin (GPIOA, GPIO_PIN_7)) {
-			HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_2);
-			click();
-//			move_n_steps_x(-1);
-			HAL_Delay (220);
+				else if (!HAL_GPIO_ReadPin (GPIOD, GPIO_PIN_9)) {
+					scrollDown();
+					HAL_Delay (220);
+				}
 		}
+
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
 		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+	}
+
+	void EXTI15_10_IRQHandler (void)
+	{
+		if (Util::current_player_index == 1) {
+			if (!HAL_GPIO_ReadPin (GPIOD, GPIO_PIN_10)) {
+				click();
+				HAL_Delay (220);
+			}
+			else if (!HAL_GPIO_ReadPin (GPIOD, GPIO_PIN_11)) {
+				//back();
+				HAL_Delay (220);
+			}
+		}
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
 	}
 
 //	uint8_t xbuffer[3];
@@ -204,11 +230,17 @@ void init_gpio(){
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-//	 TESTING FUNCTION
+	// User 1
 	GPIO_InitStruct.Pin = GPIO_PIN_7 | GPIO_PIN_6 | GPIO_PIN_5;
 	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	// User 2
+	GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 }
 
 static void tim3_init(void){
@@ -285,10 +317,6 @@ static void tim4_init(void){
 	}
 //  HAL_TIM_MspPostInit(&htim4);
 }
-
-
-
-
 
 void init_tim(){
 	HAL_NVIC_SetPriority(TIM4_IRQn, 1, 1);
@@ -371,14 +399,28 @@ int main(void)
 	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 1, 1);
 	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
+	HAL_NVIC_SetPriority(EXTI15_10_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 //	init_dice();
 	init_players();
 	init_motors();
+//	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
 
 //	move_n_steps_x(1);
-	move_n_steps_x(1);
+//	move_n_steps_y(1);
 
-//	play();
+//	move_n_steps_x(1);
+//	move_n_steps_x(1);
+//	test_move_x (420*-11);
+//	test_move_x (420*11);
+//	test_move_y (420*11);
+//	test_move_x (1);	//
+//	test_move_y (1);	// 387
+
+	//Enable Motor x
+
+	play();
 
 //	move_n_steps_x(1);
 

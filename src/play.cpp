@@ -149,10 +149,9 @@ void getChanceAction(int ccc_id){
 	    break;
 	case 8: //Make general repairs on all your property: For each house pay $25, For each hotel  $100.
 	    break;
-	case 9: //Pay poor tax of $15.
-		// DO AN IF CONDITION HERE
-//		Util::current_player->money -= 15;
-//		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	case 9: //Get dividends of $15.
+		Util::current_player->money += 15;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
 	    break;
 	case 10: //Take a trip to Reading Railroad.  If you pass Go, collect $200.
 		if(Util::current_player->position > 5){
@@ -166,13 +165,85 @@ void getChanceAction(int ccc_id){
 		movePieceMiddle(39);
 		getPropertyAction(39);
 	    break;
-	case 12: //You have been elected Chairman of the Board. Pay each player $50.
-	    break;
+	case 12: //You have been elected Chairman of the Board. Get bonus of $50.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+		break;
 	case 13: //Your building loan matures. Receive $150.
 		Util::current_player->money += 150;
 		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
 	    break;
 	case 14: //You have won a crossword competition. Collect $100
+		Util::current_player->money += 100;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	}
+	Util::action_complete = true;
+}
+
+void getCCAction(int ccc_id){
+	uint8_t buffer[105];
+	int nearest_utility_pos = getNearestUtility();
+	int nearest_railroad_pos = getNearestRailroad();
+	switch(ccc_id){
+	case 0: //Advance to Go.
+		movePieceMiddle(0);
+		Util::current_player->money += 200;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+		break;
+	case 1: //Bank error in your favor. Collect $200.
+		Util::current_player->money += 200;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+		break;
+	case 2: //No Doctor's fees. Get $50.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+		break;break;
+	case 3: //From sale of stock you get $50.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+		break;
+	case 4: //Go to Jail. Go directly to jail. Do not pass Go, Do not collect $200.
+		movePieceMiddle(10);
+		//DO JAIL THINGS
+	    break;
+	case 5: //Grand Opera Night. Collect $50 for opening night seats.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 6: //Holiday Fund matures. Receive $100.
+		Util::current_player->money += 100;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 7: //Income tax refund. Collect $20.
+		Util::current_player->money += 20;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 8: //It is your birthday. Collect $10
+		Util::current_player->money += 10;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 9: //Life insurance matures – Collect $100
+		Util::current_player->money += 100;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 10: //No Hospital Fees. Get $50.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 11: //No School fees. Get $50.
+		Util::current_player->money += 50;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 12: //Receive $25 consultancy fee.
+		Util::current_player->money += 25;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 13: //You have won second prize in a beauty contest. Collect $10.
+		Util::current_player->money += 10;
+		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
+	    break;
+	case 14: //You inherit $100
 		Util::current_player->money += 100;
 		sprintf((char *) buffer, "{\"action\": \"update\", \"player\":\"%d\", \"money\": \"%d\"}\r\n", Util::current_player_index, Util::current_player->money);
 	    break;
@@ -190,8 +261,8 @@ void getNewAction(int position_index, int ccc_id){
 	case 3: //Chance
 		getChanceAction(ccc_id);
 		break;
-	case 4:
-		//community chest
+	case 4: //Community Chest
+		getCCAction(ccc_id);
 		break;
 
 	}
@@ -205,6 +276,10 @@ void movePlayer(Profile* player, int dice_roll, int ccc_id){
 	int new_position = player->position + dice_roll;
 	if (new_position > 39){
 		new_position -= 39;
+		uint8_t sbuffer[80] = {0};
+		Util::current_player->money += 200;
+		sprintf((char *) sbuffer, "{\"action\": \"update\", \"player\": \"%d\", \"money\": \"%d\"}\r\n", Util::current_player->number - 1, Util::current_player->money);
+		HAL_UART_Transmit(&Util::raspi_handle, sbuffer, sizeof(sbuffer), HAL_MAX_DELAY);
 	}
 
 	uint8_t sbuffer[70] = {0};
@@ -213,7 +288,7 @@ void movePlayer(Profile* player, int dice_roll, int ccc_id){
 	HAL_Delay(1000);
 
 //	int move_successful;
-//	move_piece(player, player->position, new_position);
+	move_piece(player, player->position, new_position);
 	//Error handling for move
 
 	player->position = new_position;
@@ -256,11 +331,16 @@ void play(){
 
 	for(;;){
 		HAL_Delay(1500);
+		dice_roll = 0;
 
 		//Send dicerolling and dice_roll actions
-		dice_roll = sendDiceRoll();
+		while (dice_roll <= 0 || dice_roll > 12)
+			dice_roll = sendDiceRoll();
 
 		int ccc_id = rand() % 15;
+		while(ccc_id == 7 || ccc_id == 8){
+			ccc_id = rand() % 15;
+		}
 		//Move player to new spot
 		movePlayer(Util::current_player, dice_roll, ccc_id);
 
